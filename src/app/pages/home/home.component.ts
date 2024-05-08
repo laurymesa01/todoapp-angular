@@ -1,4 +1,4 @@
-import { Component, computed, signal } from '@angular/core';
+import { Component, Injector, OnInit, computed, effect, inject, signal } from '@angular/core';
 import { Filters, Task } from '../../models/task.model';
 import { FormControl, Validators, ReactiveFormsModule } from '@angular/forms';
 
@@ -9,29 +9,8 @@ import { FormControl, Validators, ReactiveFormsModule } from '@angular/forms';
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
 })
-export class HomeComponent {
-  tasks = signal<Task[]>([
-    {
-      id: Date.now(),
-      title: 'Estudiar para el examen teorico de la licencia',
-      completed: false
-    },
-    {
-      id: Date.now(),
-      title: 'Crear portfolio',
-      completed: false
-    },
-    {
-      id: Date.now(),
-      title: 'Empezar a trabajar',
-      completed: false
-    },
-    {
-      id: Date.now(),
-      title: 'Comprarme un carro',
-      completed: false
-    },
-  ]);
+export class HomeComponent implements OnInit{
+  tasks = signal<Task[]>([]);
 
   Filters = Filters;
   filter = signal<Filters>(Filters.All);
@@ -46,13 +25,6 @@ export class HomeComponent {
     }
 
     return filterMap[filter]();
-    // if(filter === 'pending'){
-    //   return tasks.filter(task => !task.completed)
-    // }
-    // if(filter === 'completed'){
-    //   return tasks.filter(task => task.completed)
-    // }
-    // return tasks
   })
 
   newTaskCtrl = new FormControl('', {
@@ -62,6 +34,26 @@ export class HomeComponent {
       Validators.pattern('^\\S.*$')
     ]
   })
+
+  injector = inject(Injector);
+
+  constructor(){ }
+
+  ngOnInit(){
+    const storage = localStorage.getItem('tasks');
+    if (storage) {
+      const tasks = JSON.parse(storage);
+      this.tasks.set(tasks);
+    }
+    this.trackTasks();
+  }
+
+  trackTasks(){
+    effect(() => {
+      const tasks = this.tasks();
+      localStorage.setItem('tasks',JSON.stringify(tasks))
+    }, { injector: this.injector })
+  }
 
   createNewTodo(){
     if(this.newTaskCtrl.valid){
