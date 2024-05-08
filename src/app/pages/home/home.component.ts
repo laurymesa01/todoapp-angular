@@ -74,13 +74,41 @@ export class HomeComponent {
         }
         return task;
       })
-    })
+    });
   }
 
-  // StyleCompletedTask(){
-  //   let style = {
-  //     'text-decoration': 'line-through'
-  //   }
-  //   return style;
-  // }
+  updateTaskEditingMode(index: number){
+    this.tasks.update(tasks => {
+      return tasks.map((task, position) => {
+        if (position === index && !task.completed) {
+          return {
+            ...task,
+            editing: true
+          }
+        }
+        return {
+          ...task,
+          editing: false
+        };
+      })
+    });
+  }
+
+  updateTaskText(index: number, event: Event){
+    const input = event.target as HTMLInputElement;
+    const newTitle = input.value;
+    this.tasks.update(tasks => {
+      return tasks.map((task, position) => {
+        if (position === index) {
+          return {
+            ...task,
+            title: newTitle,
+            editing: false
+          }
+        }
+        return task;
+      })
+    });
+  }
+
 }

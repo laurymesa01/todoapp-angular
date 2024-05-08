@@ -18,13 +18,15 @@
     <section class="main">
       <ul class="todo-list">
         @for (task of tasks(); track $index) {
-          <li [class.completed]="task.completed">
+          <li (dblclick)="updateTaskEditingMode($index)"
+              [class.completed]="task.completed"
+              [class.editing]="task.editing">
             <div class="view">
               <input class="toggle" type="checkbox" [checked]="task.completed" (change)="updateTask($index)" />
               <label>{{task.title}}</label>
               <button class="destroy" (click)="deleteTask($index)"></button>
             </div>
-            <input class="edit" [value] = task.title />
+            <input class="edit" [value] = task.title (keydown.enter)="updateTaskText($index, $event)"/>
           </li>
         }
       </ul>
