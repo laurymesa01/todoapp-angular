@@ -18,7 +18,7 @@
     <section class="main">
       <ul class="todo-list">
         @for (task of tasks(); track $index) {
-          <li>
+          <li [class.completed]="task.completed">
             <div class="view">
               <input class="toggle" type="checkbox" [checked]="task.completed" (change)="updateTask($index)" />
               <label>{{task.title}}</label>
